@@ -1,0 +1,18 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "8069:8069"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    command: >
+      odoo
+      --db_host=${DB_HOST}
+      --db_port=${DB_PORT}
+      --db_user=${DB_USER}
+      --db_password=${DB_PASSWORD}
+      --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons
+
+volumes:
+  odoo-db-data:

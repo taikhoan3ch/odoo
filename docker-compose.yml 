@@ -1,18 +1,38 @@
 version: '3'
+
 services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: railway
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   web:
     build: .
     ports:
       - "8069:8069"
+    depends_on:
+      - db
     environment:
+      - DB_HOST=${PGHOST}
+      - DB_PORT=${PGPORT}
+      - DB_USER=${PGUSER}
+      - DB_PASSWORD=${PGPASSWORD}
       - DATABASE_URL=${DATABASE_URL}
     command: >
       odoo
-      --db_host=${DB_HOST}
-      --db_port=${DB_PORT}
-      --db_user=${DB_USER}
-      --db_password=${DB_PASSWORD}
+      --db_host=${PGHOST}
+      --db_port=${PGPORT}
+      --db_user=${PGUSER}
+      --db_password=${PGPASSWORD}
+      --db_name=${PGDATABASE}
       --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons
 
 volumes:
+  pgdata:
   odoo-db-data:

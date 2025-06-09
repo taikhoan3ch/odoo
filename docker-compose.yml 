@@ -1,38 +1,32 @@
-version: '3'
+version: '3.1'
 
 services:
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: railway
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  web:
-    build: .
-    ports:
-      - "8069:8069"
+  odoo:
+    image: odoo:17  # hoặc phiên bản bạn muốn
     depends_on:
       - db
+    ports:
+      - "8069:8069"
     environment:
-      - DB_HOST=${PGHOST}
-      - DB_PORT=${PGPORT}
-      - DB_USER=${PGUSER}
-      - DB_PASSWORD=${PGPASSWORD}
-      - DATABASE_URL=${DATABASE_URL}
-    command: >
-      odoo
-      --db_host=${PGHOST}
-      --db_port=${PGPORT}
-      --db_user=${PGUSER}
-      --db_password=${PGPASSWORD}
-      --db_name=${PGDATABASE}
-      --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons
+      - HOST=db
+      - USER=postgres
+      - PASSWORD=BrrBHzIGyoVBEFLbNTxfPFYhOTqLSmbH
+      - DATABASE=railway
+      - PGHOST=switchback.proxy.rlwy.net
+      - PGPORT=36887
+      - PGUSER=postgres
+      - PGPASSWORD=BrrBHzIGyoVBEFLbNTxfPFYhOTqLSmbH
+      - PGDATABASE=railway
+    volumes:
+      - odoo-data:/var/lib/odoo
+      - ./addons:/mnt/extra-addons
+
+  # Service "db" is optional here, since we're using Railway DB
+  # Just define a placeholder to satisfy `depends_on`, but it's not used
+  db:
+    image: busybox
+    entrypoint: /bin/sh
+    command: -c "exit 0"
 
 volumes:
-  pgdata:
-  odoo-db-data:
+  odoo-data:
